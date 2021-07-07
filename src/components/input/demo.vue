@@ -11,12 +11,7 @@ import { defineComponent, ref } from 'vue'
 export default defineComponent({
   name: 'InputDemo',
 
-  setup(props, { emit }) {
-    console.log(
-      '🚀 ~ file: demo.vue ~ line 17 ~ setup ~ props, { emit }',
-      props,
-      { emit }
-    )
+  setup(props) {
     const text = ref('')
     return {
       text,
