@@ -11,7 +11,7 @@ import { defineComponent, ref } from 'vue'
 export default defineComponent({
   name: 'InputDemo',
 
-  setup(props) {
+  setup() {
     const text = ref('')
     return {
       text,

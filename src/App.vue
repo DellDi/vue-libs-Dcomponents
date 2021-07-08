@@ -1,18 +1,22 @@
 <template>
   <div>
-    <demo-input></demo-input>
+    <!-- <demo-input></demo-input>
+    <br /> -->
+    <demo-form ></demo-form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import DemoInput from './components/input/demo.vue'
+import { defineComponent } from 'vue'
+// import DemoInput from './components/input/demo.vue'
+import DemoForm from './components/form/demo.vue'
 export default defineComponent({
   name: 'App',
   components: {
-    DemoInput
-  }
-});
+    // DemoInput,
+    DemoForm,
+  },
+})
 </script>
 
 <style lang="scss">
