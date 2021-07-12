@@ -9,7 +9,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 // import DemoInput from './components/input/demo.vue'
-import DemoForm from './components/form/demo.vue'
+import DemoForm from './components/Form/demo.vue'
 export default defineComponent({
   name: 'App',
   components: {

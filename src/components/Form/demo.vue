@@ -1,18 +1,21 @@
 <template>
   <div class="demo-box">
     <d-form-item label="姓名">
-      <d-input></d-input>
+      <d-input v-model="text"></d-input>
     </d-form-item>
   </div>
 </template>
 
 <script>
+import { ref } from '@vue/reactivity'
 export default {
   name: 'FormDemo',
-  setup () {
+  setup (props, { emit }) {
+    const text = ref('')
 
-
-    return {}
+    return {
+      text
+    }
   }
 }
 </script>
