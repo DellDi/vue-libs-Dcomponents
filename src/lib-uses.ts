@@ -1,5 +1,5 @@
 import { App } from 'vue'
-import Input from './components/Input/index'
+import Input from './components/input/input'
 import FormItem from './components/Form/FormItem'
 
 const components = [Input, FormItem]

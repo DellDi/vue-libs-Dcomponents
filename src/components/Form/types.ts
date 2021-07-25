@@ -1,11 +1,4 @@
-/*
- * @Author: dell di
- * @Date: 2021-07-08 09:43:19
- * @LastEditTime: 2021-07-12 10:29:10
- * @LastEditors: di
- * @Description:
- * @FilePath: \micro_enginerd:\myFront\vue-libs-Dcomponents\src\components\Form\types.ts
- */
+import { RuleItem } from 'async-validator'
 import { InjectionKey } from 'vue'
 
 // type InjectProp =  (T:string() => void)
@@ -24,3 +17,8 @@ export interface InjectionFunc {
 // type InjectionFunc = handleControlBlur | handleControlChange
 
 export const FormItemKey: InjectionKey<InjectionFunc> = Symbol('form-item-key')
+
+export type ValidTrigger = 'change' | 'blur'
+export interface DntRuleItem extends RuleItem {
+  trigger?: ValidTrigger
+}

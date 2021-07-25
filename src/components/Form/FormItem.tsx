@@ -1,30 +1,69 @@
-import { defineComponent, provide, ref } from 'vue'
+import { defineComponent, PropType, provide, ref } from 'vue'
 import './index.scss'
-import { FormItemKey } from './types'
+import { DntRuleItem, FormItemKey, ValidTrigger } from './types'
+import Schema from 'async-validator'
 
 export default defineComponent({
   name: 'DFormItem',
   props: {
     label: [String],
+    prop: {
+      type: String,
+      default: '',
+    },
+    rules: {
+      type: [Object, Array] as PropType<DntRuleItem | DntRuleItem[]>,
+      default: () => ({}),
+    },
   },
   setup(props, { emit, slots }) {
     const errMsg = ref('')
+    const getRules = (trigger: ValidTrigger): DntRuleItem[] => {
+      const rule = props.rules
+      const ruleArr = Array.isArray(rule) ? rule : [rule]
+
+      const trueRules = ruleArr.filter((item) => {
+        const trig = item?.trigger || 'change'
+        return trig === trigger
+      })
+
+      return trueRules
+    }
+    const validate = (value: string, rules: DntRuleItem[]): Promise<any> => {
+      if (rules && props.prop) {
+        const schema = new Schema({
+          [props.prop]: rules,
+        })
+        schema
+          .validate({ [props.prop]: value })
+          .then(() => {
+            errMsg.value = ''
+            return true
+          })
+          .catch(({ errors }) => {
+            errMsg.value = errors[0].message
+            return errMsg
+          })
+      }
+      return Promise.resolve(true)
+    }
+
     const handleControlChange = (value: string) => {
-      console.log(
-        '🚀 ~ file: FormItem.tsx ~ line 20 ~ handleValueChange ~ value',
-        value
-      )
+      const trueRules = getRules('change')
+      if (trueRules) {
+        if (trueRules.length) {
+          validate(value, trueRules)
+        }
+      }
     }
     const handleControlBlur = (value: string) => {
-      console.log(
-        '🚀 ~ file: FormItem.tsx ~ line 26 ~ handleValueBlur ~ value',
-        value
-      )
+      const trueRules = getRules('blur')
+      if (trueRules) {
+        if (trueRules.length) {
+          validate(value, trueRules)
+        }
+      }
     }
-    provide(FormItemKey, {
-      handleControlChange,
-      handleControlBlur,
-    })
 
     const renderLabel = () => {
       return slots.label ? (
@@ -33,6 +72,11 @@ export default defineComponent({
         <label class="item-label">{props.label}</label>
       )
     }
+
+    provide(FormItemKey, {
+      handleControlChange,
+      handleControlBlur,
+    })
 
     return () => {
       return (
