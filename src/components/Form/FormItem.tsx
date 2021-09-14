@@ -1,7 +1,21 @@
-import { defineComponent, PropType, provide, ref } from 'vue'
+/*
+ * @Author: dell di
+ * @Date: 2021-07-18 10:12:10
+ * @LastEditTime: 2021-09-14 23:48:44
+ * @LastEditors: di
+ * @Description:
+ * @FilePath: \vue-next-libs\src\components\Form\FormItem.tsx
+ */
+import { defineComponent, PropType, inject, provide, ref } from 'vue'
 import './index.scss'
-import { DntRuleItem, FormItemKey, ValidTrigger } from './types'
-import Schema from 'async-validator'
+import {
+  DntRuleItem,
+  FormContext,
+  FormItemKey,
+  FormKey,
+  ValidTrigger,
+} from './types'
+import Schema, { ValidateError } from 'async-validator'
 
 export default defineComponent({
   name: 'DFormItem',
@@ -13,23 +27,23 @@ export default defineComponent({
     },
     rules: {
       type: [Object, Array] as PropType<DntRuleItem | DntRuleItem[]>,
-      default: () => ({}),
     },
   },
   setup(props, { emit, slots }) {
     const errMsg = ref('')
+    const parent = inject<FormContext>(FormKey)
     const getRules = (trigger: ValidTrigger): DntRuleItem[] => {
-      const rule = props.rules
-      const ruleArr = Array.isArray(rule) ? rule : [rule]
-
-      const trueRules = ruleArr.filter((item) => {
-        const trig = item?.trigger || 'change'
-        return trig === trigger
-      })
-
-      return trueRules
+      const rules = props.rules || parent?.rules[props.prop]
+      if (rules) {
+        const ruleArr = Array.isArray(rules) ? rules : [rules]
+        return ruleArr.filter((item) => item.trigger === trigger)
+      }
+      return []
     }
-    const validate = (value: string, rules: DntRuleItem[]): Promise<any> => {
+    const validate = (
+      value: string,
+      rules: DntRuleItem[]
+    ): Promise<boolean | ValidateError> => {
       if (rules && props.prop) {
         const schema = new Schema({
           [props.prop]: rules,
