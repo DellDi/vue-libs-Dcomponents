@@ -1,21 +1,28 @@
 /*
  * @Author: dell di
  * @Date: 2021-07-18 10:12:10
- * @LastEditTime: 2021-09-14 23:48:44
+ * @LastEditTime: 2021-09-15 23:28:27
  * @LastEditors: di
  * @Description:
- * @FilePath: \vue-next-libs\src\components\Form\FormItem.tsx
+ * @FilePath: \docs-pressc:\Users\di\Desktop\myStudy\vue-next-libs\src\components\Form\FormItem.tsx
  */
-import { defineComponent, PropType, inject, provide, ref } from 'vue'
+import { defineComponent, PropType, inject, provide, ref, onMounted } from 'vue'
 import './index.scss'
 import {
   DntRuleItem,
   FormContext,
   FormItemKey,
   FormKey,
+  validDateFunc,
   ValidTrigger,
 } from './types'
 import Schema, { ValidateError } from 'async-validator'
+import { useExpose } from '@/uses'
+let id = 0
+
+function generateId() {
+  return 'form-item-' + id++
+}
 
 export default defineComponent({
   name: 'DFormItem',
@@ -30,23 +37,40 @@ export default defineComponent({
     },
   },
   setup(props, { emit, slots }) {
+    const currentId = generateId()
     const errMsg = ref('')
     const parent = inject<FormContext>(FormKey)
-    const getRules = (trigger: ValidTrigger): DntRuleItem[] => {
+
+    onMounted(() => {
+      parent?.addItem({
+        id: currentId,
+        prop: props.prop,
+        validate,
+      })
+    })
+    
+    const getRules = (trigger?: ValidTrigger): DntRuleItem[] => {
       const rules = props.rules || parent?.rules[props.prop]
       if (rules) {
         const ruleArr = Array.isArray(rules) ? rules : [rules]
-        return ruleArr.filter((item) => item.trigger === trigger)
+        if (trigger) {
+          return ruleArr.filter((item) => item.trigger === trigger)
+        } else {
+          return ruleArr
+        }
+      } else {
+        return []
       }
-      return []
     }
     const validate = (
       value: string,
-      rules: DntRuleItem[]
+      rules?: DntRuleItem[]
     ): Promise<boolean | ValidateError> => {
-      if (rules && props.prop) {
+      const trueRules = rules || getRules()
+
+      if (trueRules.length && props.prop) {
         const schema = new Schema({
-          [props.prop]: rules,
+          [props.prop]: trueRules,
         })
         schema
           .validate({ [props.prop]: value })
@@ -91,6 +115,8 @@ export default defineComponent({
       handleControlChange,
       handleControlBlur,
     })
+
+    // useExpose({ validate })
 
     return () => {
       return (
